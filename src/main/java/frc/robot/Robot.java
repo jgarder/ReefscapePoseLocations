@@ -7,11 +7,14 @@ package frc.robot;
 import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructEntry;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -21,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.AlphaBots.NT;
 import frc.robot.AlphaBots.advantageKitBootstrap;
+import frc.robot.AprilTag.TagType;
 import frc.robot.subsystems.Elevator;
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
@@ -37,6 +41,12 @@ public class Robot extends TimedRobot {
   StructEntry<Pose2d> NT_myStraightloc = NT.getStructEntry_Pose2D("Poses","StraightLoc",new Pose2d());//straight out from the april tag. a centered pick for de-algae/processor/pickup 
   StructEntry<Pose2d> NT_Leftloc = NT.getStructEntry_Pose2D("Poses","leftLoc",new Pose2d());//LEFT FROM Robot TOWARDS tag view!
   StructEntry<Pose2d> NT_rightloc = NT.getStructEntry_Pose2D("Poses","rightLoc",new Pose2d());//Right Given View Robot TOWARDS tag!
+  StructEntry<Pose2d> NT_ClosestTag = NT.getStructEntry_Pose2D("Poses","ClosestTag",new Pose2d());//shows closest tag to robotchassis
+  StructEntry<Pose2d> NT_Simloc = NT.getStructEntry_Pose2D("Poses","SimChassisLoc",new Pose2d());
+  StructEntry<Pose2d> NT_ClosestSource = NT.getStructEntry_Pose2D("Poses","ClosestSource",new Pose2d());
+  StructEntry<Pose2d> NT_ClosestReef = NT.getStructEntry_Pose2D("Poses","ClosestReef",new Pose2d());
+  StructEntry<Pose2d> NT_ClosestProcessor = NT.getStructEntry_Pose2D("Poses","ClosestProcessor",new Pose2d());
+  StructEntry<Pose2d> NT_ClosestBarge = NT.getStructEntry_Pose2D("Poses","ClosestBarge",new Pose2d());
   DoubleEntry NT_tagID = NT.getDoubleEntry("", "TagID", chosenAprilTagID);
  
   
@@ -56,10 +66,16 @@ public class Robot extends TimedRobot {
     m_elevator.updateTelemetry();
     CommandScheduler.getInstance().run();
   }
-
+  Pose2d SimRobotChassisLoc = new Pose2d();
+  double simTranlatespeed = .3;
+  double simRotateSpeed = 5;
   @Override
   public void simulationPeriodic() {
     // Update the simulation model.
+    SimRobotChassisLoc = new Pose2d(SimRobotChassisLoc.getX()+(simTranlatespeed*m_joystick.getLeftX()),
+                                    SimRobotChassisLoc.getY()+(simTranlatespeed*-m_joystick.getLeftY()),
+                                    SimRobotChassisLoc.getRotation().plus(Rotation2d.fromDegrees(simRotateSpeed*-m_joystick.getRightX())));
+    NT_Simloc.set(SimRobotChassisLoc);
     m_elevator.simulationPeriodic();
   }
   double ReefWidthCenteronCenter = Units.inchesToMeters(15);
@@ -71,6 +87,14 @@ public class Robot extends TimedRobot {
     NT_myStraightloc.set(AprilTagManager.getStraightOutLoc(chosenAprilTagID, Units.inchesToMeters(6)));
     NT_Leftloc.set(apriltaglocations.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,true));
     NT_rightloc.set(apriltaglocations.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,false));
+    //Pose2d RobotChassisLoc = AprilTagManager.getStraightOutLoc(chosenAprilTagID, Units.inchesToMeters(6));
+
+    NT_ClosestSource.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Source).Pose);
+    NT_ClosestProcessor.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Processor).Pose);
+    NT_ClosestReef.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Reef).Pose);
+    NT_ClosestBarge.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,(DriverStation.getAlliance().isPresent() & DriverStation.getAlliance().get().equals(Alliance.Blue))? TagType.BlueBarge:TagType.RedBarge).Pose);
+
+    NT_ClosestTag.set(apriltaglocations.getClosestTagToRobotCenter(SimRobotChassisLoc).Pose);
     if (m_joystick.getHID().getBackButton()) {
       // Here, we set the constant setpoint of 0.75 meters.
       m_elevator.reachGoal(Constants.kSetpointMeters);
