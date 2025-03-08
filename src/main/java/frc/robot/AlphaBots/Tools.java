@@ -42,13 +42,13 @@ public class Tools {
     return -output;
   }
 
-      public static double getdistancetopose(Pose2d currentPose2d,Pose2d targetPose2d)
-    {
-      double Xpose_Offset = currentPose2d.getX() - targetPose2d.getX();
-      double Ypose_Offset = currentPose2d.getY() - targetPose2d.getY();   
-  
-      var Currdistance = Math.abs(Math.hypot(Xpose_Offset, Ypose_Offset));
-  
-      return Currdistance;
-    }
+    public static double getdistancetopose(Pose2d currentPose2d,Pose2d targetPose2d)
+  {
+    double Xpose_Offset = currentPose2d.getX() - targetPose2d.getX();
+    double Ypose_Offset = currentPose2d.getY() - targetPose2d.getY();   
+
+    var Currdistance = Math.abs(Math.hypot(Xpose_Offset, Ypose_Offset));
+
+    return Currdistance;
+  }
 }

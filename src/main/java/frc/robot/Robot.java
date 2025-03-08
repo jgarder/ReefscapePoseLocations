@@ -22,9 +22,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.AlphaBots.AprilTag;
 import frc.robot.AlphaBots.NT;
 import frc.robot.AlphaBots.advantageKitBootstrap;
-import frc.robot.AprilTag.TagType;
+import frc.robot.generated.TunerConstants;
+import frc.robot.AlphaBots.AprilTag.TagType;
+import frc.robot.subsystems.AprilTagManager;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
@@ -32,7 +36,8 @@ public class Robot extends TimedRobot {
   private final CommandXboxController m_joystick = new CommandXboxController(Constants.kJoystickPort);
   private final Elevator m_elevator = new Elevator();
   //private final advantageKitBootstrap akit = new advantageKitBootstrap(this);
-  private final AprilTagManager apriltaglocations = new AprilTagManager();
+  public static final  CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  private final AprilTagManager ATMan = new AprilTagManager(drivetrain); 
   private int chosenAprilTagID = 0;
 
   StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
@@ -51,7 +56,7 @@ public class Robot extends TimedRobot {
  
   
   public Robot() {
-
+    DriverStation.silenceJoystickConnectionWarning(true);
     //akit.startAdvantageKitLogger();//before robot container even boots we log.
     //m_joystick.a().onTrue(new InstantCommand(()->{publisher.set(AprilTagLocations.Blue.Processor.Pose);}));
     //m_joystick.b().onTrue(new InstantCommand(()->{publisher.set(AprilTagLocations.Blue.blueBarge.Pose);}));
@@ -66,7 +71,7 @@ public class Robot extends TimedRobot {
     m_elevator.updateTelemetry();
     CommandScheduler.getInstance().run();
   }
-  Pose2d SimRobotChassisLoc = new Pose2d();
+  public static Pose2d SimRobotChassisLoc = new Pose2d();
   double simTranlatespeed = .3;
   double simRotateSpeed = 5;
   @Override
@@ -85,16 +90,16 @@ public class Robot extends TimedRobot {
     System.out.println(ourtag.ID + " ID : tag found : " + ourtag.name);
     NT_myloc.set(ourtag.Pose);
     NT_myStraightloc.set(AprilTagManager.getStraightOutLoc(chosenAprilTagID, Units.inchesToMeters(6)));
-    NT_Leftloc.set(apriltaglocations.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,true));
-    NT_rightloc.set(apriltaglocations.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,false));
+    NT_Leftloc.set(AprilTagManager.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,true));
+    NT_rightloc.set(AprilTagManager.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,false));
     //Pose2d RobotChassisLoc = AprilTagManager.getStraightOutLoc(chosenAprilTagID, Units.inchesToMeters(6));
 
-    NT_ClosestSource.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Source).Pose);
-    NT_ClosestProcessor.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Processor).Pose);
-    NT_ClosestReef.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Reef).Pose);
-    NT_ClosestBarge.set(apriltaglocations.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,(DriverStation.getAlliance().isPresent() & DriverStation.getAlliance().get().equals(Alliance.Blue))? TagType.BlueBarge:TagType.RedBarge).Pose);
+    NT_ClosestSource.set(AprilTagManager.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Source).Pose);
+    NT_ClosestProcessor.set(AprilTagManager.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Processor).Pose);
+    NT_ClosestReef.set(AprilTagManager.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Reef).Pose);
+    NT_ClosestBarge.set(AprilTagManager.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,(DriverStation.getAlliance().isPresent() & DriverStation.getAlliance().get().equals(Alliance.Blue))? TagType.BlueBarge:TagType.RedBarge).Pose);
 
-    NT_ClosestTag.set(apriltaglocations.getClosestTagToRobotCenter(SimRobotChassisLoc).Pose);
+    NT_ClosestTag.set(AprilTagManager.getClosestTagToRobotCenter(SimRobotChassisLoc).Pose);
     if (m_joystick.getHID().getBackButton()) {
       // Here, we set the constant setpoint of 0.75 meters.
       m_elevator.reachGoal(Constants.kSetpointMeters);

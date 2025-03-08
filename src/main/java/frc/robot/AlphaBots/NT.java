@@ -7,8 +7,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringArrayEntry;
+import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StructEntry;
-import edu.wpi.first.networktables.StructPublisher;
 
 public class NT {
     public static final String TeamNetworkTableName = "AlphaBots";
@@ -27,6 +27,10 @@ public class NT {
     {
         return NT.table.getStringArrayTopic(SubTableName + "/" + key).getEntry(defaultvalue);
     }
+    public static StringEntry getStringEntry(String SubTableName,String key, String defaultvalue)
+    {
+        return NT.table.getStringTopic(SubTableName + "/" + key).getEntry(defaultvalue);
+    }
     // public static NetworkTableEntry getNetworkTableEntry(String SubTableName,String key, String[] defaultvalue)
     // {
     //     return NT.table.getEntry(SubTableName + "/" + key).getEntry(defaultvalue);
@@ -35,6 +39,5 @@ public class NT {
     {
         return NT.table.getStructTopic(SubTableName + "/" + key, Pose2d.struct).getEntry(new Pose2d());
     }
-
     
 }
