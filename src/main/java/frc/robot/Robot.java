@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
   StructEntry<Pose2d> NT_Leftloc = NT.getStructEntry_Pose2D("Poses","leftLoc",new Pose2d());//LEFT FROM Robot TOWARDS tag view!
   StructEntry<Pose2d> NT_rightloc = NT.getStructEntry_Pose2D("Poses","rightLoc",new Pose2d());//Right Given View Robot TOWARDS tag!
   StructEntry<Pose2d> NT_ClosestTag = NT.getStructEntry_Pose2D("Poses","ClosestTag",new Pose2d());//shows closest tag to robotchassis
-  StructEntry<Pose2d> NT_Simloc = NT.getStructEntry_Pose2D("Poses","SimChassisLoc",new Pose2d());
+  //StructEntry<Pose2d> NT_Simloc = NT.getStructEntry_Pose2D("Poses","ChassisLoc",new Pose2d());
   StructEntry<Pose2d> NT_ClosestSource = NT.getStructEntry_Pose2D("Poses","ClosestSource",new Pose2d());
   StructEntry<Pose2d> NT_ClosestReef = NT.getStructEntry_Pose2D("Poses","ClosestReef",new Pose2d());
   StructEntry<Pose2d> NT_ClosestProcessor = NT.getStructEntry_Pose2D("Poses","ClosestProcessor",new Pose2d());
@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
     SimRobotChassisLoc = new Pose2d(SimRobotChassisLoc.getX()+(simTranlatespeed*m_joystick.getLeftX()),
                                     SimRobotChassisLoc.getY()+(simTranlatespeed*-m_joystick.getLeftY()),
                                     SimRobotChassisLoc.getRotation().plus(Rotation2d.fromDegrees(simRotateSpeed*-m_joystick.getRightX())));
-    NT_Simloc.set(SimRobotChassisLoc);
+    //NT_Simloc.set(SimRobotChassisLoc);//handled inside apriltagmanager
     m_elevator.simulationPeriodic();
   }
   double ReefWidthCenteronCenter = Units.inchesToMeters(15);

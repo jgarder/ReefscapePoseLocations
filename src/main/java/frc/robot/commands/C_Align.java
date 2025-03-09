@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -52,7 +54,7 @@ public class C_Align extends Command{
     String className = this.getClass().getSimpleName();
     public final Timer TimeToAlignTimer = new Timer();
     public final frc.robot.subsystems.CommandSwerveDrivetrain drivetrain = Robot.drivetrain;
-    public final SwerveRequest.FieldCentric FCdriveAuton = new SwerveRequest.FieldCentric();
+    public final SwerveRequest.FieldCentric FCdriveAuton = new SwerveRequest.FieldCentric();//.withForwardPerspective(ForwardPerspectiveValue.BlueAlliance); using blue alliance forward we dont need to mirror our drive commands. 
 
     private final PIDController AlignXPid = new PIDController(drivetrainThings.k_PoseX_P,drivetrainThings.k_PoseX_I,drivetrainThings.k_PoseX_D);
     private final PIDController AlignYPid = new PIDController(drivetrainThings.k_PoseY_P,drivetrainThings.k_PoseY_I,drivetrainThings.k_PoseY_D);
@@ -74,6 +76,7 @@ public class C_Align extends Command{
     Pose2d CurrentPose;//this is our latest position according to our chassis odometry
     Pose2d TargetPose;//this is where we wnt to go in field space coords X,y,Rotation
     Pose2d PoseOffset;//This is how far we are from where we want to be. this is CurrentPose minus TargetPose.
+
     public static final String PidAlignmentClassname = "pidAlignment";
     public static StructEntry<Pose2d> NT_AlignSetpoint = NT.getStructEntry_Pose2D("Poses","AlignSetpoint",new Pose2d());
     public static StringEntry NT_AlignedUsing = NT.getStringEntry(PidAlignmentClassname, "AlignedUsing", "none");
@@ -155,7 +158,7 @@ public class C_Align extends Command{
       boolean shoulduseLLMT1Pose = LimelightMt1 !=null && LimelightMt1.tagCount > 0;// & LimelightMt1.avgTagDist < TagdistMaxMeters;
       if(shoulduseLLMT1Pose){
         CurrentPose = LimelightMt1.pose;
-        
+        NT_AlignedUsing.set("LimelightMt1");
       }
       else
       {
@@ -182,25 +185,7 @@ public class C_Align extends Command{
       
     }
 
-    // @Override
-    // public boolean isFinished() {
-    //     boolean isatSetpos = frc.robot.AlphaBots.Tools.isPosAtSetpoint(SubSystem.getPosition(), wantedPosition, Tolerance);
-    //     if(isatSetpos)
-    //     {
-    //         if(SettleDebounceTimer.get() > debounceSecondsNeeded)
-    //         {
-    //             NT_PivotPosOk.set(true);
-    //             return true;
-                
-    //         } 
-    //     }
-    //     else
-    //     {
-    //         SettleDebounceTimer.restart();
-    //     }
-    //     NT_PivotPosOk.set(false);
-    //     return false;
-    // }
+
     public final Timer SettleDebounceTimer = new Timer();
     private double debounceSecondsNeeded = .02;
 

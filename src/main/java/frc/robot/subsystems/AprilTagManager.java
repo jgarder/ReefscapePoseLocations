@@ -28,9 +28,12 @@ public class AprilTagManager extends SubsystemBase
     public static double robotsize = 30.25/2;//size no bumpers divided by 2
     public static double robotmetersdistToCenter = Units.inchesToMeters(RobotDefaultOffset+robotsize+bumperthickness);
 
+
     public static final double ReefWidthCenterOffset = Units.inchesToMeters(12.94)/2;// used during test Units.inchesToMeters(12.875)/2; //Reef Width CenteronCenter divided in half
     public static final double SourcePickupWidthCenterOffset = Units.inchesToMeters(24)/2; //Reef Width CenteronCenter divided in half
     public static final double ExtraMetersoffsetForAlgaePickup = Units.inchesToMeters(7.25);
+    public static final double SourceOffset = Units.inchesToMeters(-0.5); //LIVE
+    //public static double final SourceOffset =  Units.inchesToMeters(60); //TESTING ONLY
     
     StructEntry<Pose2d> NT_myloc = NT.getStructEntry_Pose2D("Poses","TagLoc",new Pose2d());
     StructEntry<Pose2d> NT_myStraightloc = NT.getStructEntry_Pose2D("Poses","StraightLoc",new Pose2d());//straight out from the april tag. a centered pick for de-algae/processor/pickup 
@@ -205,8 +208,7 @@ public class AprilTagManager extends SubsystemBase
         return new Pose2d(offcenterX, offcenterY, Thistag.Pose.getRotation());
     }
 
-    public static double SourceOffset = Units.inchesToMeters(-0.5); //LIVE
-    //public static double SourceOffset =  Units.inchesToMeters(60); //TESTING ONLY
+
     public static List<AprilTag> tagList = Arrays.asList(
         //Blue Side
         new AprilTag(13,"LeftSource",new Pose2d(Units.inchesToMeters(33.51),Units.inchesToMeters(291.20),Rotation2d.fromDegrees(306)),0,Alliance.Blue).WithType(TagType.Source)
