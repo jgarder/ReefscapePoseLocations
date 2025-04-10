@@ -86,12 +86,14 @@ public class Robot extends TimedRobot {
   double ReefWidthCenteronCenter = Units.inchesToMeters(15);
   @Override
   public void teleopPeriodic() {
+    AprilTag ClosestTag = AprilTagManager.getClosestTagToRobotCenter(SimRobotChassisLoc);
+    NT_ClosestTag.set(ClosestTag.Pose);
     AprilTag ourtag = AprilTagManager.getTagbyID(chosenAprilTagID);
     System.out.println(ourtag.ID + " ID : tag found : " + ourtag.name);
     NT_myloc.set(ourtag.Pose);
-    NT_myStraightloc.set(AprilTagManager.getStraightOutLoc(chosenAprilTagID, Units.inchesToMeters(6)));
-    NT_Leftloc.set(AprilTagManager.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,true));
-    NT_rightloc.set(AprilTagManager.getOffSet90Loc(chosenAprilTagID, Units.inchesToMeters(6), ReefWidthCenteronCenter,false));
+    NT_myStraightloc.set(AprilTagManager.getStraightOutLoc(ClosestTag.ID, Units.inchesToMeters(6)));
+    NT_Leftloc.set(AprilTagManager.getOffSet90Loc(ClosestTag.ID, Units.inchesToMeters(6), ReefWidthCenteronCenter,true));
+    NT_rightloc.set(AprilTagManager.getOffSet90Loc(ClosestTag.ID, Units.inchesToMeters(6), ReefWidthCenteronCenter,false));
     //Pose2d RobotChassisLoc = AprilTagManager.getStraightOutLoc(chosenAprilTagID, Units.inchesToMeters(6));
 
     NT_ClosestSource.set(AprilTagManager.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Source).Pose);
@@ -99,7 +101,7 @@ public class Robot extends TimedRobot {
     NT_ClosestReef.set(AprilTagManager.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,TagType.Reef).Pose);
     NT_ClosestBarge.set(AprilTagManager.getClosestTagofTypeToRobotCenter(SimRobotChassisLoc,(DriverStation.getAlliance().isPresent() & DriverStation.getAlliance().get().equals(Alliance.Blue))? TagType.BlueBarge:TagType.RedBarge).Pose);
 
-    NT_ClosestTag.set(AprilTagManager.getClosestTagToRobotCenter(SimRobotChassisLoc).Pose);
+   
     if (m_joystick.getHID().getBackButton()) {
       // Here, we set the constant setpoint of 0.75 meters.
       m_elevator.reachGoal(Constants.kSetpointMeters);
