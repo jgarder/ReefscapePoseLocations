@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.LoggedRobot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.AlphaBots.AprilTag;
 import frc.robot.AlphaBots.NT;
-import frc.robot.AlphaBots.advantageKitBootstrap;
 import frc.robot.generated.TunerConstants;
 import frc.robot.AlphaBots.AprilTag.TagType;
 import frc.robot.subsystems.AprilTagManager;
